@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>document</title>
+    <!--<link rel="stylesheet" href="../lib/editor.md/css/editormd.css">-->
+    <link rel="stylesheet" href="../lib/editor.md/css/editormd.preview.css">
+    <style>
+        #md-list {
+            width: 200px;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+    <div id="md-list">
+        <ul><!-- 通过js加载数据 --></ul>
+    </div>
+    <div id="test-editormd">
+        <textarea style="display:none;"></textarea>
+    </div>
+</body>
+<script src="../lib/jquery.js"></script>
+<!--<script src="../lib/react.min.js"></script>-->
+<!--<script src="../lib/react-dom.min.js"></script>-->
+<script src="../lib/editor.md/lib/marked.min.js"></script>
+<script src="../lib/editor.md/lib/prettify.min.js"></script>
+<script src="../lib/editor.md/editormd.js"></script>
+<script src="../lib/editor.md/underscore.min.js"></script>
+<script src="../lib/editor.md/raphael.min.js"></script>
+<script src="../lib/editor.md/sequence-diagram.min.js"></script>
+<script src="../lib/editor.md/flowchart.min.js"></script>
+<script src="../lib/editor.md/jquery.flowchart.min.js"></script>
+<script src="../js/document.min.js"></script>
+<script>
+    $(function() {
+//        $.get('../lib/CHANGE.md', (md) => {
+//            var testEditor = editormd.markdownToHTML("test-editormd", {
+//                markdown        : md ,//+ "\r\n" + $("#append-test").text(),
+//                htmlDecode      : false,       // 开启 HTML 标签解析，为了安全性，默认不开启
+//                htmlDecode      : "style,script,iframe",  // you can filter tags decode
+//                //tocContainer    : "#custom-toc-container", // 自定义 ToC 容器层
+//                //gfm             : false,
+//                //tocDropdown     : true,
+//                // markdownSourceCode : true, // 是否保留 Markdown 源码，即是否删除保存源码的 Textarea 标签
+//                emoji           : true,
+//                taskList        : true,
+//                tex             : true,  // 默认不解析
+//                flowChart       : true,  // 默认不解析
+//                sequenceDiagram : true,  // 默认不解析
+//            });
+//        });
+    });
+</script>
+</html>

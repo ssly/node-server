@@ -1,0 +1,23 @@
+@import 'variable';
+
+* {margin: 0; padding: 0;}
+body {
+    font-size: $baseFontSize;
+}
+aside {
+    float: left;
+    width: 200px;
+    border: 1px solid $baseBorderColor;
+    min-height: $baseHeight;
+}
+section {
+    width: 100%;
+    border: 1px solid $baseBorderColor;
+    min-height: $baseHeight;
+}
+footer {
+    text-align: center;
+}
+li {
+    list-style: none;
+}

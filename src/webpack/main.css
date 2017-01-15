@@ -1,0 +1,18 @@
+* {margin: 0; padding: 0;}
+aside {
+    float: left;
+    width: 200px;
+    border: 1px solid #ccc;
+    min-height: 500px;
+}
+section {
+    width: 100%;
+    border: 1px solid #ccc;
+    min-height: 500px;
+}
+footer {
+    text-align: center;
+}
+li {
+    list-style: none;
+}
