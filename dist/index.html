@@ -1,46 +1,204 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta charset="UTF-8">
-    <title>个人网站</title>
-    <link rel="stylesheet" href="css/main.css">
+    <title>Shared Platform</title>
 </head>
+<style>
+	body {
+		background-image: url('assets/desk.jpeg');
+		background-repeat: no-repeat;
+	}
+	a {
+  	text-decoration: none;
+	}
+	.nav-box {
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+		text-align: center;
+		width: 400px;
+		opacity: .7;
+	}
+	.nav-box:hover {
+		opacity: .9;
+		transition: .5s;
+	}
+	.nav-box .nav-list {
+		width: 100%;
+		height: 65px;
+		line-height: 65px;
+		display: block;
+		border-bottom: 1px solid #09a800;
+		background-color: #2db354;
+	}
+	.nav-box .nav-list a {
+		color: #111;
+		display: block;
+	}
+	.nav-box .nav-list a:hover {
+		background-color: #36ca61;
+		transition: .5s;
+	}
+</style>
 <body>
-    <h1>刘阳的个人网站</h1>
-    <h2>React学习</h2>
-    <a href="http://133.130.108.93:8000/qxz/index.html">qxzMusic</a>
-    <a href="html/webpack.html">webpack学习</a>
-    <a href="http://www.w3cplus.com/sassguide/syntax.html">sass学习</a>
-    <a href="html/document.html">文档</a>
-    <div id="root"></div>
-    <div id="log-record">
-        <h4>留言板</h4>
-        <div id="log-list">
-            <!-- 通过js加载数据 -->
-        </div>
-        <input type="text" id="log-name"><br>
-        <textarea id="log-text" cols="30" rows="10"></textarea>
-        <button type="button" onclick="saveLogDate()">保存</button>
-    </div>
-    <h4>资源下载</h4>
-    <a href="../resource/vue.7z">vue</a><br>
-    <a href="../resource/stylus.7z">stylus</a><br>
-    <a href="../resource/vue.zip">vuedemo</a><br>
-    <a href="../resource/editor.md-master.zip">editor.md</a><br>
-    <a href="../resource/phantomjs-2.1.1-windows.zip">phantomjs</a><br>
-    <a href="../resource/karma.7z">karma</a><br>
-    <a href="../resource/angular.js-1.4.0.zip">angular-1.4.0</a><br>
-    <a href="../resource/angular-1.5.8.zip">angular-1.5.8</a><br>
-    <a href="../resource/webdriverio.7z">webdriverio</a><br>
-    <a href="../resource/webpack.zip">webpack</a><br>
-    <a href="../resource/ChromeStandalone_54.0.2840.71_Setup.exe">chrome-54</a><br>
-    <a href="../resource/mongodb.7z">npm-mongodb</a><br>
-    <!--<a href="../resource/webdrive.7z">webdriver</a><br>-->
-    <!--<a href="../resource/selenium.7z">selenium-python</a><br>-->
-    <h5>正在努力建设当中，请等待.....</h5>
-    <h6>预计1月15日，完成首页构建，以及文档编写列表功能</h6>
-    <h6>预计1月22日，完成音乐/文档/班级照片模块</h6>
+	<div id="home">
+			<ul class="nav-box">
+					<li class="nav-list"><a href="#/taskRouter">任务记录</a></li>
+					<li class="nav-list"><a href="#/docRouter">文档分享</a></li>
+					<li class="nav-list"><a href="javascript:alert('敬请期待');">敬请期待</a></li>
+			</ul>
+	</div>
 </body>
-<script src="lib/jquery.js"></script>
-<script src="js/main.js"></script>
+<script type="text/javascript">
+	// Cross-browser-compliant
+	requestAnimationFrame = window.requestAnimationFrame ||
+													window.mozRequestAnimationFrame ||
+													window.webkitRequestAnimationFrame ||
+													window.msRequestAnimationFrame ||
+													window.oRequestAnimationFrame ||
+													function(callback) { setTimeout(callback, 1000 / 60); };
+
+	/**
+		* Snow Class
+		* @param {int}   x
+		* @param {int}   y
+		* @param {int}   radius
+		* @param {Function} fn     Formular to calculate x pos and y pos
+		*/
+	function Snow (x, y, radius, fn) {
+		this.x = x;
+		this.y = y;
+		this.r = radius;
+		this.fn = fn;
+	}
+	Snow.prototype.update = function () {
+		this.x = this.fn.x (this.x, this.y);
+		this.y = this.fn.y (this.y, this.y);
+
+		if (this.x > window.innerWidth ||
+			this.x < 0 ||
+			this.y > window.innerHeight ||
+			this.y < 0
+		){
+			this.x = getRandom('x');
+			this.y = 0;
+		}
+	}
+	Snow.prototype.draw = function (cxt) {
+		var grd = cxt.createRadialGradient (this.x, this.y, 0, this.x, this.y, this.r);
+		grd.addColorStop(0, "rgba(255, 255, 255, 0.9)");
+	grd.addColorStop(.5, "rgba(255, 255, 255, 0.5)");
+	grd.addColorStop(1, "rgba(255, 255, 255, 0)");
+		cxt.fillStyle = grd;
+	cxt.fillRect (this.x - this.r, this.y - this.r, this.r * 2, this.r * 2);
+	}
+
+	/**
+		* Snowlist class
+		* Container to hold snow objects
+		*/
+	SnowList = function () {
+		this.list = [];
+	}
+	SnowList.prototype.push = function (snow) {
+		this.list.push (snow);
+	}
+	SnowList.prototype.update = function () {
+		for (var i = 0, len = this.list.length; i < len; i++) {
+			this.list[i].update();
+		}
+	}
+	SnowList.prototype.draw = function (cxt) {
+		for (var i = 0, len = this.list.length; i < len; i++) {
+			this.list[i].draw (cxt);
+		}
+	}
+	SnowList.prototype.get = function (i) {
+		return this.list[i];
+	}
+	SnowList.prototype.size = function () {
+		return this.list.length;
+	}
+
+	/**
+		* Generate random x-pos, y-pos or fn functions
+		* @param  {string} option x|y|fnx|fny
+		* @return {int|Function}
+		*/
+	function getRandom (option) {
+		var ret, random;
+		switch (option) {
+			case 'x':
+				ret = Math.random () * window.innerWidth;
+				break;
+			case 'y':
+				ret = Math.random () * window.innerHeight;
+				break;
+			case 'r':
+				ret = 2 + (Math.random () * 6);
+				break;
+			case 'fnx':
+				random = 27 + Math.random () * 100;
+				ret = function (x, y) {
+					return x +  0.5 * Math.sin (y / random);
+				};
+				break;
+			case 'fny':
+				random = 0.4 + Math.random () * 1.4
+				ret = function (x, y) {
+					return y + random;
+				};
+				break;
+		}
+		return ret;
+	}
+
+	// Start snow
+	function startSnow () {
+		// Create canvas
+		var canvas = document.createElement ('canvas'), cxt;
+		canvas.height = window.innerHeight;
+		canvas.width = window.innerWidth;
+		canvas.setAttribute ('style', 'position: fixed;left: 0;top: 0;pointer-events: none;');
+		canvas.setAttribute ('id', 'canvas_snow');
+		document.getElementsByTagName ('body')[0].appendChild (canvas);
+		cxt = canvas.getContext ('2d');
+		// Create snow objects
+		var snowList = new SnowList();
+		for(var i = 0; i < 200; i++){
+			var snow, randomX, randomY, randomR, randomFnx, randomFny;
+			randomX = getRandom ('x');
+			randomY = getRandom ('y');
+			randomR = getRandom ('r');
+			randomFnx = getRandom('fnx');
+			randomFny = getRandom('fny');
+			snow = new Snow (randomX, randomY, randomR, {
+				x: randomFnx,
+				y: randomFny
+			});
+			snow.draw (cxt);
+			snowList.push (snow);
+		}
+		// Update snow position data, and redraw them in each frame
+		requestAnimationFrame (function(){
+			cxt.clearRect (0, 0, canvas.width, canvas.height);
+			snowList.update ();
+			snowList.draw (cxt);
+			requestAnimationFrame (arguments.callee);
+		})
+	}
+
+	// Handle window resize
+	window.onresize = function () {
+		var canvasSnow = document.getElementById('canvas_snow');
+		canvasSnow.width = window.innerWidth;
+		canvasSnow.height = window.innerHeight;
+	}
+
+	// Let it snow O(∩_∩)0
+	startSnow();
+</script>
 </html>

@@ -4,9 +4,9 @@ let express = require('express'),
 
 // 连接mongodb数据库
 let MongoClient = require('mongodb').MongoClient;
+let ObjectID = require('mongodb').ObjectID;
 let dbUrl_ly = 'mongodb://127.0.0.1:27017/ly';
 
-let ObjectID = require('mongodb').ObjectID;
 let fs = require('fs'),
     path = require('path'),
     url = require('url');
@@ -52,7 +52,7 @@ let music = (function Music() {
                                             album: data.tags.album,
                                             src: path.join('../resource/mp3', file),
                                             duration: 0,
-                                            path: path.join(baseUrl, 'resource/mp3', file)                                            
+                                            path: path.join(baseUrl, 'resource/mp3', file)
                                         })
                                         if (++count === files.length) {
                                             console.log('歌曲加载完毕');
@@ -77,19 +77,21 @@ let music = (function Music() {
 })();
 
 music.getAllMusic(music.musicUrl);
+
+router.all('*', (req, res, next) => {
+    console.log('router.all: set public property.');
+    res.header('Access-Control-Allow-Origin', '*');
+    next();
+});
 /**
  * 获取所有音乐信息
  */
 router.get('/find', (req, res, next) => {
     console.log('I will find all music info.');
-    res.header('Access-Control-Allow-Origin', '*');
     db.collection('music_info', (err, table) => {
         // 查音乐详情表，并返回
         table.find().toArray((err, result) => {
-            if (err) {
-                throw err;
-            }
-
+            if (err) {throw err;}
             res.send(result);
             console.log('返回音乐数据成功');
         });
@@ -131,7 +133,7 @@ router.post('/saveLog', (req, res, next) => {
                 db.close();
             });
         });
-    });    
+    });
 });
 
 router.post('/delLog', (req, res, next) => {
@@ -147,7 +149,7 @@ router.post('/delLog', (req, res, next) => {
             }
             db.close();
         });
-    });    
+    });
 });
 
 router.get('/getMd', (req, res, next) => {
@@ -166,4 +168,53 @@ router.get('/getMd', (req, res, next) => {
     });
 });
 
+// 任务清单相关接口
+router.get('/getTask', (req, res) => {
+    console.log('Get task from mongodb.');
+    MongoClient.connect(dbUrl_ly, (err, db) => {
+        console.log(`Connect to ${db.s.databaseName} success.`);
+        let collection = db.collection('task_list');
+        collection.find({}).toArray((err, result) => {
+            res.send(result);
+            db.close();
+        });
+    });
+});
+router.post('/saveTask', (req, res) => {
+    if ('object' !== typeof req.body) {
+        res.send('Please send a object to save.');
+        return;
+    }
+    console.log('Save task to mongodb.');
+    MongoClient.connect(dbUrl_ly, (err, db) => {
+        console.log(`Connect to ${db.s.databaseName} success.`);
+        let collection = db.collection('task_list');
+        collection.insertOne(req.body, (err, result) => {
+            if (err) { res.send(err); }
+            res.send({
+                result: true
+            });
+            db.close();
+        });
+    });
+});
+router.post('/updateTask', (req, res) => {
+    if ('object' !== typeof req.body) {
+        res.send('Please send a object to update.');
+        return;
+    }
+    let _id = req.body._id;
+    delete req.body._id;
+    MongoClient.connect(dbUrl_ly, (err, db) => {
+        console.log(`Connect to ${db.s.databaseName} success.`);
+        let collection = db.collection('task_list');
+        collection.updateOne({ _id: ObjectID(_id) }, { $set: req.body }, (err, result) => {
+            if (err) { res.send(err); }
+            res.send({
+                result: true
+            });
+            db.close();
+        });
+    });
+});
 module.exports = router;
