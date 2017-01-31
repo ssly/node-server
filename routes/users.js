@@ -5,7 +5,7 @@ let express = require('express'),
 // 连接mongodb数据库
 let MongoClient = require('mongodb').MongoClient;
 let ObjectID = require('mongodb').ObjectID;
-let dbUrl_ly = 'mongodb://120.77.243.63:27017/ly';
+let dbUrl_ly = 'mongodb://127.0.0.1:27017/ly';
 
 let fs = require('fs'),
     path = require('path'),
@@ -172,7 +172,16 @@ router.get('/getMd', (req, res, next) => {
 router.get('/getTask', (req, res) => {
     console.log('Get task from mongodb.');
     let filter = {};
+    let limit = 10, offset = 0;
     if (req.query) {
+        if (req.query.limit) {
+            limit = req.query.limit;
+            delete req.query.limit;
+        }
+        if (req.query.offset) {
+            offset = parseInt(req.query.offset);
+            delete req.query.offset;
+        }
         for (let key in req.query) {
             if (req.query[key]) {
                 filter[key] = req.query[key];
@@ -184,10 +193,16 @@ router.get('/getTask', (req, res) => {
         console.log(`Connect to ${db.s.databaseName} success.`);
         let collection = db.collection('task_list');
         collection.find(filter, { progress: 0 }).toArray((err, result) => {
+            // 对查询到的数据进行处理
+            let arr = result.slice(offset, offset + 10);
             res.send({
                 success: true,
-                data: result,
-                msg: 'Get task list successfully.'
+                data: arr,
+                msg: 'Get task list successfully.',
+                other: {
+                    pageCount: result.length,
+                    offset: offset
+                }
             });
             db.close();
         });
