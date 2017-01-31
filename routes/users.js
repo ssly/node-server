@@ -194,7 +194,8 @@ router.get('/getTask', (req, res) => {
         let collection = db.collection('task_list');
         collection.find(filter, { progress: 0 }).toArray((err, result) => {
             // 对查询到的数据进行处理
-            let arr = result.slice(offset, offset + 10);
+            // let arr = result.slice(offset, offset + 10);
+            let arr = result;
             res.send({
                 success: true,
                 data: arr,
