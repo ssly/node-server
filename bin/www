@@ -7,9 +7,8 @@ var port = normalizePort(process.env.PORT || '80');
 app.set('port', port);
 console.log(`started on port ${port}`);
 /**
- * Create HTTP server.h
+ * Create HTTP server.
  */
-
 var server = http.createServer(app);
 
 /**

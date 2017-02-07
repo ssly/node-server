@@ -15,17 +15,15 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 
 // uncomment after placing your favicon in /dist
-app.use(favicon(path.join(__dirname, 'dist', 'favicon.ico')));
+app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 
 // 挂载静态资源文件
-app.use(express.static(path.join(__dirname, 'dist')));
+app.use(express.static(path.join(__dirname, 'public')));
 app.use('/resource', express.static(path.join(__dirname, 'resource')));
-app.use('/qxz', express.static(path.join(__dirname, 'qxz')));
-app.use(express.static(path.join(__dirname, 'views/lib')));
 
 app.use('/', index);
 app.use('/', users);
