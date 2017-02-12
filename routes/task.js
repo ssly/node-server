@@ -1,12 +1,15 @@
-function taskRouter(router) {
-  // 连接mongodb数据库
-  let MongoClient = require('mongodb').MongoClient;
-  let ObjectID = require('mongodb').ObjectID;
-  let dbUrl_ly = 'mongodb://120.77.243.63:27017/ly';
+// 连接mongodb数据库
+let MongoClient = require('mongodb').MongoClient;
+let ObjectID = require('mongodb').ObjectID;
+let dbUrl_ly = 'mongodb://localhost:27017/ly';
 
+let taskCtrl = require('../controllers/task');
+
+function taskRouter(router) {
   // 任务清单相关接口
   router.get('/getTask', (req, res) => {
-      console.log('Get task from mongodb.');
+      console.log('task: router - Get task from mongodb.');
+      // taskCtrl.getTask();
       let filter = {};
       let limit = 10, offset = 0;
       if (req.query) {
@@ -18,12 +21,18 @@ function taskRouter(router) {
               offset = parseInt(req.query.offset);
               delete req.query.offset;
           }
+          console.log(typeof req.query.progress);
           for (let key in req.query) {
               if (req.query[key]) {
-                  filter[key] = req.query[key];
+                  if (typeof req.query[key] === 'object') { // 如果值为对象，则让数据库搜索多个值
+                    filter[key] = { $in: req.query[key] };
+                  } else {
+                    filter[key] = req.query[key];
+                  }
               }
           }
       }
+      console.log(filter);
       MongoClient.connect(dbUrl_ly, (err, db) => {
           console.log(`Connect to ${db.s.databaseName} success.`);
           let collection = db.collection('task_list');
@@ -47,55 +56,24 @@ function taskRouter(router) {
   router.post('/saveTask', (req, res) => {
       if ('object' !== typeof req.body) {
           res.send('Please send a object to save.');
-          db.close();
           return;
       }
-      console.log('Save task to mongodb.');
-      MongoClient.connect(dbUrl_ly, (err, db) => {
-          console.log(`Connect to ${db.s.databaseName} success.`);
-          let collection = db.collection('task_list');
-          // 暂时添加progress为0，为了后台筛选
-          req.body.progress = '0';
-          collection.insertOne(req.body, (err, result) => {
-              if (err) { res.send(err); }
-              res.send({
-                  success: true,
-                  data: [],
-                  msg: 'Save task info successfully.'
-              });
-              db.close();
-          });
+      console.log('taskRouter: saveTask - Save task to mongodb.');
+      console.log(taskCtrl.saveTask);
+      taskCtrl.saveTask(req.body, result => {
+        res.send(result);
       });
   });
   router.post('/updateTask', (req, res) => {
+    console.log('taskRouter: updateTask - Update task to mongodb.');
       if ('object' !== typeof req.body) {
-          res.send('Please send a object to update.');
-          db.close();
+          res.send('taskRouter: updateTask - Please send a object to update.');
           return;
       }
-      let _id = req.body._id;
-      delete req.body._id;
-
-      // 判断任务是否完成
-      if (req.body.endTime) {
-          req.body.progress = 1;
-      } else {
-          req.body.progress = 0;
-      }
-
-      MongoClient.connect(dbUrl_ly, (err, db) => {
-          console.log(`Connect to ${db.s.databaseName} success.`);
-          let collection = db.collection('task_list');
-          collection.updateOne({ _id: ObjectID(_id) }, { $set: req.body }, (err, result) => {
-              if (err) { res.send(err); }
-              res.send({
-                  success: true,
-                  data: [],
-                  msg: 'Update task info successfully.'
-              });
-              db.close();
-          });
+      taskCtrl.updateTask(req.body, result => {
+        res.send(result);
       });
+
   });
   router.post('/deleteTask', (req, res) => {
       if (!req.body._id) {
