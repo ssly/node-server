@@ -21,7 +21,9 @@ function taskRouter(router) {
               offset = parseInt(req.query.offset);
               delete req.query.offset;
           }
-          console.log(typeof req.query.progress);
+          if (req.query.progress) {
+              req.query.progress = req.query.progress.split('');
+          }
           for (let key in req.query) {
               if (req.query[key]) {
                   if (typeof req.query[key] === 'object') { // 如果值为对象，则让数据库搜索多个值
@@ -32,7 +34,7 @@ function taskRouter(router) {
               }
           }
       }
-      console.log(filter);
+      console.log(`taskRouter: getTask - filter is ${filter}`);
       MongoClient.connect(dbUrl_ly, (err, db) => {
           console.log(`Connect to ${db.s.databaseName} success.`);
           let collection = db.collection('task_list');

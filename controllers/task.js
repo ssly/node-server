@@ -15,7 +15,7 @@ let taskCtrl = {
             if (err) { callback(err); }
             callback({
                 success: true,
-                data: [],
+                data: result.ops,
                 msg: 'Save task info successfully.'
             });
         });
