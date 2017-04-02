@@ -1,44 +1,44 @@
-// 连接mongodb数据库
-let MongoClient = require('mongodb').MongoClient;
-let ObjectID = require('mongodb').ObjectID;
-let dbUrl_ly = 'mongodb://localhost:27017/ly';
+/**
+ * 任务管理系统，路由配置
+ * @Author Liu Yang (34771695@qq.com)
+ * @Date   2017-02-24
+ * @Update
+ */
 
+// import modules
 let taskCtrl = require('../controllers/task');
+let mongodb = require('../mongodb');
 
 function taskRouter(router) {
   // 任务清单相关接口
   router.get('/getTask', (req, res) => {
       console.log('task: router - Get task from mongodb.');
       // taskCtrl.getTask();
-      let filter = {};
-      let limit = 10, offset = 0;
-      if (req.query) {
-          if (req.query.limit) {
-              limit = req.query.limit;
-              delete req.query.limit;
-          }
-          if (req.query.offset) {
-              offset = parseInt(req.query.offset);
-              delete req.query.offset;
-          }
-          if (req.query.progress) {
-              req.query.progress = req.query.progress.split('');
-          }
-          for (let key in req.query) {
-              if (req.query[key]) {
-                  if (typeof req.query[key] === 'object') { // 如果值为对象，则让数据库搜索多个值
-                    filter[key] = { $in: req.query[key] };
-                  } else {
-                    filter[key] = req.query[key];
-                  }
-              }
-          }
-      }
-      console.log(`taskRouter: getTask - filter is ${filter}`);
-      MongoClient.connect(dbUrl_ly, (err, db) => {
+    //   if (req.query) {
+    //       if (req.query.limit) {
+    //           limit = req.query.limit;
+    //           delete req.query.limit;
+    //       }
+    //       if (req.query.offset) {
+    //           offset = parseInt(req.query.offset);
+    //           delete req.query.offset;
+    //       }
+    //       for (let key in req.query) {
+    //           if (req.query.hasOwnProperty(key)) {
+    //               if (req.query[key]) {
+    //                   if (typeof req.query[key] === 'object') { // 如果值为对象，则让数据库搜索多个值
+    //                       filter[key] = { $in: req.query[key] };
+    //                   } else {
+    //                       filter[key] = req.query[key];
+    //                   }
+    //               }
+    //           }
+    //       }
+    //   }
+      mongodb.client.connect(mongodb.db, (err, db) => {
           console.log(`Connect to ${db.s.databaseName} success.`);
           let collection = db.collection('task_list');
-          collection.find(filter, { progress: 0 }).toArray((err, result) => {
+          collection.find({}, { progress: 0 }).toArray((err, result) => {
               // 对查询到的数据进行处理
               // let arr = result.slice(offset, offset + 10);
               let arr = result;
@@ -47,8 +47,6 @@ function taskRouter(router) {
                   data: arr,
                   msg: 'Get task list successfully.',
                   other: {
-                      pageCount: result.length,
-                      offset: offset
                   }
               });
               db.close();
@@ -61,7 +59,6 @@ function taskRouter(router) {
           return;
       }
       console.log('taskRouter: saveTask - Save task to mongodb.');
-      console.log(taskCtrl.saveTask);
       taskCtrl.saveTask(req.body, result => {
         res.send(result);
       });
@@ -83,10 +80,10 @@ function taskRouter(router) {
           db.close();
           return;
       }
-      MongoClient.connect(dbUrl_ly, (err, db) => {
+      MongoClient.connect(mongodb.db, (err, db) => {
           console.log(`Connect to ${db.s.databaseName} success.`);
           let collection = db.collection('task_list');
-          collection.deleteOne({ _id: ObjectID(req.body._id) }, (err, result) => {
+          collection.deleteOne({ _id: mongodb.ObjectID(req.body._id) }, (err, result) => {
               if (err) { res.send(err); }
               res.send({
                   success: true,
