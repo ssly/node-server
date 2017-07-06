@@ -14,7 +14,6 @@ fs.readFile(fileUrl, {encoding: 'utf8'}, (err, data) => {
         console.error(err);
         return;
     }
-    console.log(data);
 });
 
 

@@ -10,7 +10,12 @@ npm install --production
 # start project
 node bin/www
 ```
-> author 夜起叶落 weChat: yeqiyeluo 欢迎大家指导交流
+## 项目介绍
+
+> author 夜起叶落(34771695@qq.com) 欢迎大家指导交流
+
+本项目为作者练习项目，采用express为框架，搭建了一个后台服务，可以提供部分接口，如果有前端爱好者想要设计小项目，作者可以提供接口。感谢大家多多交流。
+
 
 ## 版本说明
 
