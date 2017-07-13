@@ -1,62 +1,94 @@
+const Log = require('../mongoose/log');
+
 function logRouter(router) {
+    /**
+     * 查找所有记录
+     */
+    router.get('/log/find', (req, res) => {
+        console.log('logRouter: request to /log/find.');
+        Log.find({}, (err, result) => {
+            if (err) {
+                console.log(err);
+                res.send({
+                    success: false,
+                    data: [],
+                })
+                return;
+            }
+            res.send({
+                success: true,
+                data: result,
+            })
+        });
+    });
 
-  // 连接mongodb数据库
-  let MongoClient = require('mongodb').MongoClient;
-  let ObjectID = require('mongodb').ObjectID;
-  let dbUrl_ly = 'mongodb://120.77.243.63:27017/ly';
+    /**
+     * 按名称查找记录
+     */
 
-  router.get('/getLog', (req, res, next) => {
-      MongoClient.connect(dbUrl_ly, (err, db) => {
-          if (err) { throw err; }
-          let table = db.collection('lytest');
-          console.log('connect collection lytest successfully!');
-          // 查表，并返回
-          table.find({}).toArray((err, result) => {
-              if (err) {throw err;}
-              res.send(result);
-              console.log('send data to Client successfully!');
-          }, () => {
-              db.close();
-          });
-      });
-  });
+    /**
+     * 新增记录
+     */
+    router.post('/log/add', (req, res) => {
+        console.log('logRouter: request to /log/update.');
+        if (!(req.body && req.body.name)) {
+            res.send({
+                success: false,
+                data: [],
+                msg: '请输入您的姓名',
+            });
+            return;
+        }
+        let log = new Log({
+            name: req.body.name,
+            text: req.body.text,
+        });
+        log.save((err, result) => {
+            if (err) {
+                console.log(err);
+                res.send({
+                    success: false,
+                    data: [],
+                    msg: '',
+                });
+                return;
+            }
+            res.send({
+                success: false,
+                data: result,
+                msg: '',
+            });
+        });
+    });
 
-  router.post('/saveLog', (req, res, next) => {
-      console.log('I will save data');
-      MongoClient.connect(dbUrl_ly, (err, db) => {
-          if (err) {throw err;}
-          let table = db.collection('lytest');
-              // 插表
-          table.insert({
-              name: req.body.name,
-              text: req.body.text
-          }, (err, result) => {
-              // 查表
-              table.find({}).toArray((err, result) => {
-                  if (err) { throw err; }
-                  res.send(result);
-              }, () => {
-                  console.log('操作结束');
-                  db.close();
-              });
-          });
-      });
-  });
-
-  router.post('/delLog', (req, res, next) => {
-      MongoClient.connect(dbUrl_ly, (err, db) => {
-          let table = db.collection('lytest');
-          table.deleteOne({
-              _id: ObjectID(req.body.id)
-          }, (err, msg) => {
-              if (0 === msg.result.n) {
-                  res.send('信息不存在');
-              } else {
-                  res.send(`成功刪除 ${msg.result.n} 条`);
-              }
-              db.close();
-          });
-      });
-  });
+    /**
+     * 删除记录
+     */
+    router.post('/log/del', (req, res) => {
+        console.log('logRouter: request to /log/del.');
+        if (!req.body instanceof Array || !req.body.length) {
+            res.send({
+                success: false,
+                msg: '请输入数组',
+            });
+            return;
+        }
+        if (req.body.length === 1) {
+            Log.remove({id: req.body[0]}, (err, result) => {
+                res.send({
+                    success: true,
+                    msg: '你已成功删除1条数据',
+                });
+            });
+        } else {
+            // 删除多条
+            Log.remove({id: {$in: req.body}}, (err, result) => {
+                res.send({
+                    success: true,
+                    msg: `你已成功删除${req.body.length}条数据`,
+                })
+            });
+        }
+    });
 }
 module.exports = logRouter;

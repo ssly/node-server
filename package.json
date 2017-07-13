@@ -24,6 +24,7 @@
     "jsmediatags": "^3.3.1",
     "moment": "^2.17.1",
     "mongodb": "^2.2.16",
+    "mongoose": "^4.11.1",
     "morgan": "~1.7.0",
     "serve-favicon": "~2.3.0"
   },
