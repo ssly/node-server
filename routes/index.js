@@ -8,10 +8,10 @@ const mongoose = require('mongoose');
 // const taskRouter = require('./task');
 const logRouter = require('./log');
 // const audioRouter = require('./audio');
-// const fileRouter = require('./file');
+const fileRouter = require('./file');
 
 // 连接数据库
-mongoose.connect('mongodb://localhost/ly', {useMongoClient: true});
+mongoose.connect('mongodb://119.23.51.115/ly', {useMongoClient: true});
 const db = mongoose.connection;
 db.once('open', () => {
     console.log('mongodb has been open.');
@@ -31,6 +31,6 @@ router.all('*', (req, res, next) => {
 // taskRouter(router);  // 任务管理器
 logRouter(router);   // 记事本管理器
 // audioRouter(router); // 音乐播放器
-// fileRouter(router);  // 文件上传
+fileRouter(router);  // 文件上传
 
 module.exports = router;

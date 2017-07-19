@@ -1,6 +1,6 @@
 'use strict';
 const mongoose = require('mongoose');
-let maxId = 1;
+let maxId = 0;
 
 // 创建schema模型
 let LogSchema = new mongoose.Schema({
@@ -30,7 +30,7 @@ let Log = mongoose.model('Log', LogSchema, 'log');
 
 Log.find({}, (err, result) => {
     if (result.length === 0) {
-        maxId = 1;
+        maxId = 0;
     } else if (result.length === 1) {
         maxId = result[0].id;
     } else {
