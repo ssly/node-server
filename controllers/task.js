@@ -5,11 +5,11 @@
  * @update 2017-08-19
  */
 
-const ObjectID = require('mongodb').ObjectID;
+let maxId = 0; // 后台初始化时，task表默认的ID起始值
 
-let maxId = 0;
 /**
  * 给任务数据插库时，自动赋值id，规则为在最大基础上加 1
+ * @param {object} collection task表
  */
 function getMaxIdOfTask(collection) {
   // 通过查表获取最大的id
@@ -18,10 +18,11 @@ function getMaxIdOfTask(collection) {
       console.error(err);
       return;
     }
-    maxId = result.reduce((prev, next) => {
-      return prev.id > next.id ? prev.id : next.id;
-    });
-    console.log(maxId);
+
+    // 获取最大的id值，没有数据则赋值为0
+    maxId = result.sort((x, y) => x.id - y.id).pop().id || 0;
+
+    console.log('task controllers: maxId is', maxId);
   })
 }
 
@@ -60,7 +61,7 @@ function fetch(collection, id) {
 function save(collection, item) {
   return new Promise((resolve, reject) => {
     // 给数据赋值id，遵循+1规则
-    Object.assign({ id: ++maxId }, item);
+    item = Object.assign({ id: ++maxId }, item);
 
     collection.insertOne(item, (err, result) => {
       const data = Array.isArray(result.ops) ? result.ops[0] : result.ops;
