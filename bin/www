@@ -3,7 +3,7 @@ var app = require('../app');
 var debug = require('debug')('node:server');
 var http = require('http');
 
-var port = process.env.PORT || '8081';
+var port = process.env.PORT || '80';
 app.set('port', port);
 console.log(`started on port ${port}`);
 /**
