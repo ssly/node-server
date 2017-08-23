@@ -33,11 +33,50 @@ function getMaxIdOfTask(collection) {
  * @param {object} collection 数据库表
  * @param {string} id 查询的id，如果为空，则查询所有
  */
-function fetch(collection, id) {
+function fetch(collection, options) {
   return new Promise((resolve, reject) => {
     let item = {};
 
-    id && (item.id = Number(id));
+    if (options.id) {
+      // 如果有id，只查询单条
+      item.id = Number(id)
+    } else {
+      // 其他搜索条件
+      console.log(options);
+
+      // 类型 1, 2, 3, 4
+      switch (Number(options.type)) {
+        case 1:
+        case 2:
+        case 3:
+        case 4:
+          item.type = Number(options.type);
+          break;
+        default:
+          break;
+      }
+
+      // 难易 difficult
+      switch (Number(options.difficult)) {
+        case 1:
+        case 2:
+        case 3:
+          item.difficult = Number(options.difficult);
+        default:
+          break;
+      }
+
+      // 完成度 finish
+      switch (options.finish) {
+        case 'true':
+          Boolean(options.finish) && (item.finish = true);
+        case 'false':
+          !Boolean(options.finish) && (item.finish = false);
+        default:
+          break;
+      }
+    }
+    console.log(item);
 
     collection.find(item, { _id: 0}).toArray((err, result) => {
       if (err) {

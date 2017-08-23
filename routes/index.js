@@ -21,7 +21,7 @@ mongo().then(db => {
 router.all('*', (req, res, next) => {
     console.log('router.all: set public property.');
     res.header('Access-Control-Allow-Origin', '*');
-    res.header('Access-Control-Allow-Headers', 'Origin, Content-Type, Accept');
+    res.header('Access-Control-Allow-Headers', 'Origin, Content-Type, Accept, X-Requested-With');
     res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
     next();
 });

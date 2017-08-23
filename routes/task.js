@@ -33,7 +33,7 @@ function taskRouter(router) {
     // 查询所有（多条）
     router.get('/task/manager', (req, res) => {
         console.log(common.time() + 'task: enter router /task/manager/find success');
-        controllers.fetch(manager.collection)
+        controllers.fetch(manager.collection, req.query)
             .then(result => {
                 res.send(result);
             }, (err) => {
@@ -43,7 +43,7 @@ function taskRouter(router) {
 
     // 查询数据（单条）
     router.get('/task/manager/:id', (req, res) => {
-        controllers.fetch(manager.collection, req.params.id)
+        controllers.fetch(manager.collection, {id: req.params.id})
             .then(result => {
                 res.send(result);
             }, (err) => {

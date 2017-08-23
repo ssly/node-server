@@ -2,8 +2,9 @@
 var app = require('../app');
 var debug = require('debug')('node:server');
 var http = require('http');
+var common = require('../assets/common');
 
-var port = process.env.PORT || '80';
+var port = process.env.PORT || common.port;
 app.set('port', port);
 console.log(`started on port ${port}`);
 /**
