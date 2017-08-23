@@ -20,7 +20,9 @@ function getMaxIdOfTask(collection) {
     }
 
     // 获取最大的id值，没有数据则赋值为0
-    maxId = result.sort((x, y) => x.id - y.id).pop().id || 0;
+    result.forEach(item => {
+      item.id > maxId && (maxId = item.id);
+    });
 
     console.log('task controllers: maxId is', maxId);
   })
