@@ -1,4 +1,5 @@
 var express = require('express');
+var forceSSL = require('express-force-ssl');
 var path = require('path');
 var favicon = require('serve-favicon');
 var logger = require('morgan');
@@ -12,6 +13,9 @@ var app = express();
 
 // enable gzip
 app.use(compression());
+
+// force ssl
+app.use(forceSSL);
 
 // uncomment after placing your favicon in /dist
 app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));

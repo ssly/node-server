@@ -1,6 +1,7 @@
 const common = {
   host: 'http://localhost',
-  port: 80
+  port: 80,
+  sslPort: 443
 };
 
 const timeManager = {
@@ -27,8 +28,6 @@ const timeManager = {
 };
 
 module.exports = {
-  host: common.host,
-  port: common.port,
-
+  ...common,
   time: timeManager.getTime,
 };
