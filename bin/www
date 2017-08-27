@@ -8,8 +8,8 @@ var common = require('../assets/common');
 
 // add https license
 var sslOptions = {
-  key: fs.readFileSync('./keys/private.pem'),
-  cert: fs.readFileSync('./keys/cert.crt')
+  key: fs.readFileSync('./keys/private.key'),
+  cert: fs.readFileSync('./keys/cert.pem')
 };
 
 var port = process.env.PORT || common.port;
