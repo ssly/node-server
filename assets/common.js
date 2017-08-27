@@ -1,6 +1,7 @@
 const common = {
   host: 'http://localhost',
   port: 80,
+  sslEnable: false,
   sslPort: 443
 };
 
