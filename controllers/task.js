@@ -1,8 +1,8 @@
 /**
- * 任务管理系统 controllers
- * @author Liu Yang (34771695@qq.com)
+ * Task Manager, Controllers
+ * @author Liu Yang <34771695@qq.com> (https://lius.me)
  * @create 2017-08-19
- * @update 2017-08-19
+ * @update 2017-08-31
  */
 
 let maxId = 0; // 后台初始化时，task表默认的ID起始值
@@ -24,74 +24,77 @@ function getMaxIdOfTask(collection) {
       item.id > maxId && (maxId = item.id);
     });
 
-    console.log('task controllers: maxId is', maxId);
+    console.log('Task Controllers: Get max id, max id is', maxId);
   })
 }
 
 /**
  * 查询数据
  * @param {object} collection 数据库表
- * @param {string} id 查询的id，如果为空，则查询所有
+ * @param {object} 如果存在 options.id，查询单条，否则则查询所有
  */
-function fetch(collection, options) {
+const fetch = function(collection, options) {
   return new Promise((resolve, reject) => {
+    // 0 Success, 1 Query condition error
+    let code = 0;
     let item = {};
-
     if (options.id) {
       // 如果有id，只查询单条
-      item.id = Number(id)
+      item.id = Number(id);
     } else {
-      // 其他搜索条件
-      console.log(options);
 
-      // 类型 1, 2, 3, 4
-      switch (Number(options.type)) {
-        case 1:
-        case 2:
-        case 3:
-        case 4:
+      // type 1, 2, 3, 4
+      if (options.type && options.type !== '') {
+        if (/^[1-4]$/.test(options.type)) {
           item.type = Number(options.type);
-          break;
-        default:
-          break;
+        } else {
+          code = 2;
+          reject({ code, success: false });
+          return;
+        }
       }
 
-      // 难易 difficult
-      switch (Number(options.difficult)) {
-        case 1:
-        case 2:
-        case 3:
+      // difficult 1, 2, 3
+      if (options.difficult && options.difficult !== '') {
+        if (/^[1-3]$/.test(options.difficult)) {
           item.difficult = Number(options.difficult);
-        default:
-          break;
+        } else {
+          code = 2;
+          reject({ code, success: false });
+          return;
+        }
       }
 
-      // 完成度 finish
-      switch (options.finish) {
-        case 'true':
-          Boolean(options.finish) && (item.finish = true);
-        case 'false':
-          !Boolean(options.finish) && (item.finish = false);
-        default:
-          break;
+      // finish true, false
+      if (options.finish && options.finish !== '') {
+        switch (options.finish) {
+          case 'true':
+            item.finish = true;
+            break;
+          case 'false':
+            item.finish = false;
+            break;
+          default:
+            code = 2
+            reject({ code, success: false });
+            return;
+        }
       }
     }
-    console.log(item);
+
+    console.log('Task Controller: find data\'s params is', item);
 
     collection.find(item, { _id: 0}).toArray((err, result) => {
       if (err) {
-        resolve(err);
-        return;
+        console.error(err);
+
+        reject({ code: 1, success: false });
       }
-      console.log('task ctrl: find data successfully.');
-      reject({
-        success: true,
-        data: result,
-        msg: 'Find All data successfully.',
-        other: {}
-      });
+      console.log('Task Controller: find data successfully, result is', result);
+
+      resolve({ code, success: true, data: result });
     });
-  })
+  });
 }
 
 /**
@@ -136,35 +139,36 @@ function update(collection, item) {
       console.log(result);
       resolve({
         success: true,
-        data: result.ops,
-        msg: 'Update task info successfully.'
+        data: result.ops
       });
     });
   })
 }
 
 /**
- * 更新数据（单条）
+ * 删除
  * @param {object} collection 数据库表
  * @param {array} ids 需要删除的ids
  */
-function del(collection, ids) {
-  return new Promise((resolve, reject) => {
-    let id = Number(ids);
-    collection.deleteOne({ id }, (err, result) => {
-      if (err) {
-        reject(err);
-        return;
-      }
+const del = async function (collection, ids) {
+    let count = 0;
+    let arr = [];
+    for (let i = 0; i < ids.length; i++) {
+      arr.push(await new Promise((resolve, reject) => {
+        collection.deleteOne({ id: ids[i] }, (err, result) => {
+          if (err) { reject(err) }
 
-      let count = result.result.n;
-
-      resolve({
-        success: true,
-        msg: `Delete ${count} successfully.`
-      });
-    });
-  })
+          // count delete items
+          count += result.result.n;
+          resolve();
+        });
+      }));
+    }
+    return {
+      code: 0,
+      success: true,
+      other: { count }
+    };
 }
 
 module.exports = {
