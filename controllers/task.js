@@ -38,10 +38,18 @@ const fetch = function(collection, options) {
     // 0 Success, 1 Query condition error
     let code = 0;
     let item = {};
+
+    // filter
     if (options.id) {
       // 如果有id，只查询单条
-      item.id = Number(id);
+      item.id = Number(options.id);
     } else {
+      // name fuzzy query
+      if (options.name && options.name !== '') {
+        // Eliminate the effects of wildcards "."
+        options.name = options.name.replace(/\./g, '\\.')
+        item.name = new RegExp(options.name)
+      }
 
       // type 1, 2, 3, 4
       if (options.type && options.type !== '') {
@@ -90,8 +98,29 @@ const fetch = function(collection, options) {
 
         reject({ code: 1, success: false });
       }
-      console.log('Task Controller: find data successfully, result is', result);
 
+      // sort
+      if (options.sorter) {
+        console.log('Task Controller: find data\'s sorter is', options.sorter)
+        let sorterArray = options.sorter.split('$')
+
+        if (sorterArray.length !== 2) {
+          reject({ code: 2 })
+          return
+        }
+
+        let name = sorterArray[0]
+        let sorter = sorterArray[1]
+        result.sort((a, b) => {
+          if (sorter === 'ascend') {
+
+            return a[name] === b[name] ? 0 : (a[name] > b[name] ? 1 : -1)
+          }
+          return a[name] === b[name] ? 0 : (a[name] < b[name] ? 1 : -1)
+        })
+      }
+
+      // console.log('Task Controller: find data successfully, result is', result);
       resolve({ code, success: true, data: result });
     });
   });
